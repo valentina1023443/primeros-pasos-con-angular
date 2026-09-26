@@ -38,6 +38,14 @@ export const NavigationItems: NavigationItem[] = [
         icon: 'feather icon-user',
         classes: 'nav-item'
       },
+      {
+        id: 'medicos',
+        title: 'Gestión de Médicos',
+        type: 'item',
+        url: '/inicio/medicos',
+        icon: 'feather icon-user',
+        classes: 'nav-item'
+      },
     ]
   },  
 ];
