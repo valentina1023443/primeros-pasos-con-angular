@@ -1,0 +1,94 @@
+<div class="container-fluid">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h3 class="mb-0">Gestión de usuarios</h3>
+    <button type="button" class="btn btn-primary" (click)="nuevo()">+ Nuevo usuario</button>
+  </div>
+
+  @if (mostrarForm) {
+    <div class="card mb-4">
+      <div class="card-header"><b>{{ editandoId ? 'Editar usuario' : 'Nuevo usuario' }}</b></div>
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label" for="u-username">Usuario</label>
+              <input id="u-username" class="form-control" formControlName="username"
+                [class.is-invalid]="form.controls.username.touched && form.controls.username.invalid" />
+              <div class="invalid-feedback">Mínimo 3 caracteres y sin espacios</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="u-email">Correo</label>
+              <input id="u-email" type="email" class="form-control" formControlName="email"
+                [class.is-invalid]="form.controls.email.touched && form.controls.email.invalid" />
+              <div class="invalid-feedback">Escribe un correo válido</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="u-rol">Rol</label>
+              <select id="u-rol" class="form-select" formControlName="rol">
+                <option value="ADMIN">Administrador</option>
+                <option value="VETERINARIO">Veterinario</option>
+                <option value="USUARIO">Usuario</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="u-password">
+                Contraseña @if (editandoId) { <small class="text-muted">(vacía = no cambiar)</small> }
+              </label>
+              <input id="u-password" type="password" class="form-control" formControlName="password" autocomplete="new-password"
+                [class.is-invalid]="form.controls.password.touched && form.controls.password.invalid" />
+              <div class="invalid-feedback">Mínimo 6 caracteres</div>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <div class="form-check form-switch">
+                <input id="u-activo" class="form-check-input" type="checkbox" formControlName="activo" />
+                <label class="form-check-label" for="u-activo">Usuario activo</label>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="guardando">Guardar</button>
+            <button type="button" class="btn btn-outline-secondary" (click)="cancelar()">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <div class="card">
+    <div class="card-body">
+      <input class="form-control mb-3" placeholder="Buscar por usuario, correo o rol..." [(ngModel)]="filtro" [ngModelOptions]="{ standalone: true }" />
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>#</th><th>Usuario</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Creado</th><th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of filtrados; track u.id) {
+              <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.username }} @if (esYo(u)) { <span class="badge bg-info">tú</span> }</td>
+                <td>{{ u.email }}</td>
+                <td><span class="badge bg-secondary">{{ u.rol }}</span></td>
+                <td>
+                  <span class="badge" [ngClass]="u.activo ? 'bg-success' : 'bg-danger'">{{ u.activo ? 'Activo' : 'Inactivo' }}</span>
+                </td>
+                <td>{{ u.fechaCreacion | date: 'dd/MM/yyyy' }}</td>
+                <td class="text-end text-nowrap">
+                  <button type="button" class="btn btn-sm btn-outline-primary me-1" (click)="editar(u)">Editar</button>
+                  <button type="button" class="btn btn-sm btn-outline-warning me-1" (click)="alternarActivo(u)">
+                    {{ u.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="eliminar(u)">Eliminar</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="7" class="text-center text-muted py-4">No hay usuarios para mostrar</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
