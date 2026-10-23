@@ -1,0 +1,22 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Gestión de Fórmulas Médicas</h4>
+    <button class="btn btn-primary" (click)="nueva()">+ Nueva fórmula</button>
+  </div>
+
+  <app-tabla-datos
+    [columnas]="columnas"
+    [filas]="formulas"
+    [cargando]="cargando"
+    [ordenInicial]="{ ruta: 'fechaCreacion', direccion: 'desc' }"
+    rutaFiltroFechas="fechaEmision"
+    [plantillaAcciones]="acciones"
+    mensajeVacio="No hay fórmulas médicas registradas.">
+  </app-tabla-datos>
+</div>
+
+<ng-template #acciones let-f>
+  <button class="btn btn-sm btn-outline-primary me-1" (click)="ver(f)">Ver</button>
+  <button *ngIf="f.estado === 'ACTIVA'" class="btn btn-sm btn-outline-secondary me-1" (click)="editar(f)">Editar</button>
+  <button *ngIf="f.estado === 'ACTIVA'" class="btn btn-sm btn-outline-danger" (click)="inactivar(f)">Inactivar</button>
+</ng-template>

@@ -1,4 +1,65 @@
-<div class="container">
-   <label>Usuario Component Funciona</label>
+<div class="container mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Gestión de Usuarios</h3>
+    <button class="btn btn-primary" (click)="abrirModalAgregar(modalItem)">+ Agregar usuario</button>
+  </div>
+
+  <div *ngIf="cargando">Cargando...</div>
+
+  <table class="table table-striped" *ngIf="!cargando">
+    <thead>
+      <tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Email</th><th>Activo</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of registros">
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td><span class="badge bg-primary">{{ u.rol }}</span></td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.activo ? 'Sí' : 'No' }}</td>
+        <td><button class="btn btn-sm btn-outline-secondary" (click)="abrirModalEditar(modalItem, u)">Editar</button></td>
+      </tr>
+      <tr *ngIf="registros.length === 0"><td colspan="6" class="text-center">No hay usuarios registrados</td></tr>
+    </tbody>
+  </table>
 </div>
 
+<ng-template #modalItem let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editando ? 'Editar' : 'Agregar' }} usuario</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-danger" *ngIf="mensajeError">{{ mensajeError }}</div>
+    <form [formGroup]="form">
+      <div class="mb-3">
+        <label class="form-label">Usuario</label>
+        <input type="text" class="form-control" formControlName="username">
+      </div>
+      <div class="mb-3" *ngIf="!editando">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-control" formControlName="password">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Rol (perfil)</label>
+        <select class="form-select" formControlName="rol">
+          <option value="ADMIN">Administrador</option>
+          <option value="MEDICO">Médico</option>
+          <option value="CLIENTE">Cliente</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" formControlName="email">
+      </div>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" formControlName="activo" id="activoCheck">
+        <label class="form-check-label" for="activoCheck">Activo</label>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-primary" (click)="guardar(modal)">Guardar</button>
+  </div>
+</ng-template>

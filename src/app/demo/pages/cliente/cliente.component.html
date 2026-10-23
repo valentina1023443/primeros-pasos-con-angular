@@ -1,0 +1,84 @@
+<div class="container mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Gestión de Clientes</h3>
+    <button class="btn btn-primary" (click)="abrirModalAgregar(modalItem)">+ Agregar cliente</button>
+  </div>
+
+  <div *ngIf="cargando">Cargando...</div>
+
+  <table class="table table-striped" *ngIf="!cargando">
+    <thead>
+      <tr><th>ID</th><th>Documento</th><th>Nombres</th><th>Apellidos</th><th>Teléfono</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of registros">
+        <td>{{ c.id }}</td>
+        <td>{{ c.tipoDocumento }} {{ c.numeroDocumento }}</td>
+        <td>{{ c.nombres }}</td>
+        <td>{{ c.apellidos }}</td>
+        <td>{{ c.telefono }}</td>
+        <td><button class="btn btn-sm btn-outline-secondary" (click)="abrirModalEditar(modalItem, c)">Editar</button></td>
+      </tr>
+      <tr *ngIf="registros.length === 0"><td colspan="6" class="text-center">No hay clientes registrados</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #modalItem let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editando ? 'Editar' : 'Agregar' }} cliente</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-danger" *ngIf="mensajeError">{{ mensajeError }}</div>
+    <form [formGroup]="form">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Tipo documento</label>
+          <select class="form-select" formControlName="tipoDocumento">
+            <option value="CC">CC</option>
+            <option value="CE">CE</option>
+            <option value="TI">TI</option>
+          </select>
+        </div>
+        <div class="col-md-8 mb-3">
+          <label class="form-label">Número documento</label>
+          <input type="text" class="form-control" formControlName="numeroDocumento">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Nombres</label>
+        <input type="text" class="form-control" formControlName="nombres">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Apellidos</label>
+        <input type="text" class="form-control" formControlName="apellidos">
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Fecha de nacimiento</label>
+          <input type="date" class="form-control" formControlName="fechaNacimiento">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Género</label>
+          <select class="form-select" formControlName="genero">
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <input type="text" class="form-control" formControlName="telefono">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Dirección</label>
+        <input type="text" class="form-control" formControlName="direccion">
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-primary" (click)="guardar(modal)">Guardar</button>
+  </div>
+</ng-template>

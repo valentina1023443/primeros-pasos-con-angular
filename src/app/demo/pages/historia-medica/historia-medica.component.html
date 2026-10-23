@@ -1,0 +1,20 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Gestión de Historias Clínicas</h4>
+    <button class="btn btn-primary" (click)="nueva()">+ Nueva historia clínica</button>
+  </div>
+
+  <app-tabla-datos
+    [columnas]="columnas"
+    [filas]="historias"
+    [cargando]="cargando"
+    [ordenInicial]="{ ruta: 'fechaHora', direccion: 'desc' }"
+    rutaFiltroFechas="fechaHora"
+    [plantillaAcciones]="acciones"
+    mensajeVacio="No hay historias clínicas registradas.">
+  </app-tabla-datos>
+</div>
+
+<ng-template #acciones let-historia>
+  <button class="btn btn-sm btn-outline-primary" (click)="ver(historia)">Ver</button>
+</ng-template>
