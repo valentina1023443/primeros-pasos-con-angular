@@ -1,0 +1,39 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div><h4>Despacho y dispensación</h4><p class="text-muted mb-0">Solo se descuenta inventario al confirmar una entrega. Los lotes vigentes se consumen priorizando el vencimiento más próximo (FEFO).</p></div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary" (click)="cargar()">Actualizar</button>
+      <button class="btn btn-outline-secondary" *ngIf="comprobanteDespachoId" (click)="descargarComprobante(comprobanteDespachoId)">Descargar último comprobante</button>
+    </div>
+  </div>
+  <div class="alert alert-info" *ngIf="mensaje">{{ mensaje }}</div>
+  <div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Fórmula / fecha</th><th>Paciente y propietario</th><th>Medicamento / pauta</th><th>Prescrito</th><th>Disponible vigente</th><th>Entregar ahora</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      <ng-container *ngFor="let item of pendientes">
+        <tr>
+          <td>#{{ item.formula_id }}<br><small>{{ item.fecha_emision | date:'short' }}</small></td>
+          <td>{{ item.mascota }}<br><small>{{ item.cliente }}</small></td>
+          <td><strong>{{ item.medicamento }}</strong><br><small>{{ item.dosis }} {{ item.unidad_dosis }} cada {{ item.frecuencia_horas }} h por {{ item.duracion_dias }} días</small><br><small>{{ item.indicaciones }}</small></td>
+          <td>{{ item.cantidad_prescrita }}<br><small>pendiente: {{ item.cantidad_pendiente }}</small></td>
+          <td><span [class.text-danger]="item.stock_disponible < item.cantidad_pendiente">{{ item.stock_disponible }}</span><br><button class="btn btn-link btn-sm p-0" (click)="verLotes(item)">{{ lotesFormula[item.formula_id] ? 'Ocultar lotes' : 'Ver lotes y vencimientos' }}</button></td>
+          <td><input class="form-control form-control-sm" type="number" min="1" [max]="item.cantidad_pendiente" [value]="item.cantidadEntrega ?? item.cantidad_pendiente" (input)="item.cantidadEntrega=+$any($event.target).value"></td>
+          <td><span class="badge bg-warning text-dark">{{ item.estado_despacho || 'PENDIENTE_DESPACHO' }}</span></td>
+          <td class="d-flex gap-1 flex-wrap">
+            <button class="btn btn-sm btn-outline-primary" [disabled]="item.estado_despacho === 'EN_PREPARACION' || preparando===item.formula_id" (click)="preparar(item)">{{ item.estado_despacho === 'EN_PREPARACION' ? 'En preparación' : 'Preparar' }}</button>
+            <button class="btn btn-sm btn-success" [disabled]="item.estado_despacho !== 'EN_PREPARACION' || item.stock_disponible < 1 || item.cantidad_pendiente < 1" (click)="confirmar(item)">Confirmar entrega</button>
+          </td>
+        </tr>
+        <tr *ngIf="lotesFormula[item.formula_id]">
+          <td colspan="8" class="bg-light">
+            <strong>Lotes disponibles (se aplicará FEFO automáticamente)</strong>
+            <div class="table-responsive mt-2"><table class="table table-sm mb-0"><thead><tr><th>Código</th><th>Lote</th><th>Ingreso</th><th>Vencimiento</th><th>Cantidad</th><th>Estado</th></tr></thead>
+              <tbody><tr *ngFor="let lote of lotesFormula[item.formula_id]"><td>{{ lote.codigo }}</td><td>{{ lote.numero_lote }}</td><td>{{ lote.fecha_ingreso | date:'yyyy-MM-dd' }}</td><td>{{ lote.fecha_vencimiento | date:'yyyy-MM-dd' }}</td><td>{{ lote.cantidad }}</td><td><span [class.text-danger]="lote.estado_lote === 'VENCIDO'" [class.text-warning]="lote.estado_lote === 'PROXIMO_A_VENCER'">{{ lote.estado_lote }}</span></td></tr>
+              <tr *ngIf="!lotesFormula[item.formula_id].length"><td colspan="6">No hay lotes registrados para este medicamento.</td></tr></tbody></table></div>
+          </td>
+        </tr>
+      </ng-container>
+      <tr *ngIf="!cargando && !pendientes.length"><td colspan="8" class="text-center py-4">No hay fórmulas pendientes de despacho.</td></tr>
+    </tbody>
+  </table></div></div>
+</div>

@@ -1,0 +1,46 @@
+package com.uniminuto.clinica.apicontroller;
+
+import com.uniminuto.clinica.api.ClienteApi;
+import com.uniminuto.clinica.entity.Cliente;
+import com.uniminuto.clinica.exception.BadRequestException;
+import com.uniminuto.clinica.models.ClienteRq;
+import com.uniminuto.clinica.models.MiRespuestaRS;
+import com.uniminuto.clinica.service.ClienteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class ClienteApiController implements ClienteApi {
+
+    @Autowired
+    private ClienteService clienteService;
+
+    @Override
+    public ResponseEntity<List<Cliente>> getClientes() throws BadRequestException {
+        return ResponseEntity.ok(this.clienteService.getAllClientes());
+    }
+
+    @Override
+    public ResponseEntity<Cliente> getClientesByNumeroDocumento(String numeroDocumento) throws BadRequestException {
+        return ResponseEntity.ok(this.clienteService.getClienteByNumeroDocumento(numeroDocumento));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ResponseEntity<Cliente> getClienteById(Long id) {
+        return ResponseEntity.ok(this.clienteService.getClienteById(id));
+    }
+
+    @Override
+    public ResponseEntity<MiRespuestaRS> guardarCliente(ClienteRq clienteRq) throws BadRequestException {
+        return ResponseEntity.ok(this.clienteService.guardarCliente(clienteRq));
+    }
+
+    @Override
+    public ResponseEntity<MiRespuestaRS> actualizarCliente(ClienteRq clienteRq) throws BadRequestException {
+        return ResponseEntity.ok(this.clienteService.actualizarCliente(clienteRq));
+    }
+}

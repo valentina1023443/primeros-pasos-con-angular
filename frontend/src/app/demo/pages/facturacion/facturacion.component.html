@@ -1,0 +1,129 @@
+<div class="container-fluid py-3">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">Facturación y pagos</h2>
+      <p class="text-muted mb-0">Facturas de atenciones realizadas, pagos netos y movimientos de reembolso auditados.</p>
+    </div>
+    <button class="btn btn-outline-secondary" type="button" (click)="cargar()" [disabled]="facturasCargando || citasCargando">Actualizar</button>
+  </div>
+
+  <div class="alert alert-warning" *ngIf="error">{{ error }}</div>
+
+  <section class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Crear factura de una atención</h5></div>
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-xl-6 col-lg-6">
+          <label class="form-label" for="citaFacturable">Cita atendida lista para facturar</label>
+          <select id="citaFacturable" class="form-select" [(ngModel)]="citaSeleccionada" (ngModelChange)="seleccionarTarifaPorCita()" name="citaFacturable" [disabled]="citasCargando || !citas.length">
+            <option value="">{{ citasCargando ? 'Cargando atenciones…' : citas.length ? 'Seleccione una atención…' : 'No hay atenciones pendientes de facturar' }}</option>
+            <option *ngFor="let cita of citas" [value]="cita.cita_id">
+              #{{ cita.cita_id }} · {{ cita.mascota }} — {{ cita.propietario }} · {{ cita.fecha | date:'short' }} · {{ cita.veterinario }}{{ cita.especialidad ? ' · ' + cita.especialidad : '' }}
+            </option>
+          </select>
+        </div>
+        <div class="col-xl-4 col-lg-4">
+          <label class="form-label" for="tarifaFactura">Servicio / tarifa vigente</label>
+          <select id="tarifaFactura" class="form-select" [(ngModel)]="tarifaSeleccionada" name="tarifaFactura" [disabled]="!citaSeleccionada || tarifasCargando || !tarifasDisponibles.length">
+            <option value="">{{ tarifasCargando ? 'Cargando tarifas…' : tarifasDisponibles.length ? 'Seleccione el servicio…' : 'Sin tarifas vigentes para la especialidad' }}</option>
+            <option *ngFor="let tarifa of tarifasDisponibles" [value]="tarifa.id">
+              {{ tarifa.servicio }} — {{ tarifa.especialidad || 'General' }} — {{ moneda(tarifa.valor) }} + IVA {{ tarifa.iva_porcentaje }}%
+            </option>
+          </select>
+        </div>
+        <div class="col-xl-2 col-lg-2 d-grid">
+          <button class="btn btn-primary" type="button" (click)="crearFactura()" [disabled]="!citaSeleccionada || !tarifaSeleccionada || creandoFactura">
+            {{ creandoFactura ? 'Generando…' : 'Generar factura' }}
+          </button>
+        </div>
+      </div>
+      <div class="row g-3 mt-1" *ngIf="esAdministrador">
+        <div class="col-lg-3">
+          <label class="form-label" for="descuentoFactura">Descuento autorizado (COP)</label>
+          <input id="descuentoFactura" class="form-control" type="number" min="0" step="100" [(ngModel)]="descuento" name="descuentoFactura" [disabled]="creandoFactura">
+        </div>
+        <div class="col-lg-9" *ngIf="hayDescuento">
+          <label class="form-label" for="motivoDescuento">Motivo obligatorio del descuento</label>
+          <input id="motivoDescuento" class="form-control" type="text" maxlength="500" [(ngModel)]="motivoDescuento" name="motivoDescuento" [disabled]="creandoFactura" placeholder="Autorización y justificación">
+        </div>
+      </div>
+      <small class="text-muted d-block mt-2">La factura calcula el servicio seleccionado y únicamente los medicamentos con despacho completo. Las fórmulas pendientes deben completarse o cancelarse antes de facturar.</small>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <h5 class="mb-0">Facturas registradas</h5>
+      <form class="d-flex gap-2" (submit)="$event.preventDefault(); cargarFacturas()">
+        <input class="form-control form-control-sm" type="search" placeholder="Factura, cita, propietario o mascota" [(ngModel)]="filtro" name="filtroFacturas">
+        <button class="btn btn-sm btn-outline-primary" type="submit">Buscar</button>
+      </form>
+    </div>
+    <div class="card-body p-0">
+      <div class="p-4 text-center text-muted" *ngIf="facturasCargando">Cargando facturas…</div>
+      <div class="p-4 text-center text-muted" *ngIf="!facturasCargando && !facturas.length">No hay facturas para mostrar.</div>
+      <div class="table-responsive" *ngIf="!facturasCargando && facturas.length">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Factura / cita</th><th>Paciente y propietario</th><th>Atención</th><th>Total</th><th>Pagado neto</th><th>Saldo</th><th>Estado</th><th style="min-width:300px">Acciones</th></tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let factura of facturas">
+              <tr>
+                <td><strong>#{{ factura.factura_id }}</strong><br><small class="text-muted">Cita #{{ factura.cita_id }}</small></td>
+                <td>{{ factura.mascota }}<br><small class="text-muted">{{ factura.propietario }}</small></td>
+                <td>{{ factura.fecha_atencion | date:'short' }}<br><small class="text-muted">{{ factura.veterinario }}{{ factura.especialidad ? ' · ' + factura.especialidad : '' }}</small></td>
+                <td>{{ moneda(factura.total) }}<br><small class="text-muted">Subtotal {{ moneda(factura.subtotal) }} · IVA {{ moneda(factura.iva) }}{{ factura.descuento > 0 ? ' · Descuento ' + moneda(factura.descuento) : '' }}</small></td>
+                <td>{{ moneda(factura.pagado) }}</td>
+                <td>{{ moneda(factura.saldo) }}</td>
+                <td><span class="badge" [ngClass]="factura.estado === 'PAGADA' ? 'bg-success' : factura.estado === 'ANULADA' ? 'bg-danger' : factura.estado === 'PARCIAL' ? 'bg-warning text-dark' : 'bg-secondary'">{{ factura.estado }}</span></td>
+                <td>
+                  <div class="d-flex flex-wrap gap-1">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" (click)="descargar(factura.factura_id)">PDF</button>
+                    <button class="btn btn-sm btn-outline-info" type="button" (click)="alternarPagos(factura.factura_id)">{{ expanded.has(factura.factura_id) ? 'Ocultar pagos' : 'Pagos / historial' }}</button>
+                    <button class="btn btn-sm btn-outline-danger" type="button" *ngIf="esAdministrador && factura.estado !== 'ANULADA' && factura.pagado <= 0" (click)="anular(factura)">Anular</button>
+                  </div>
+                  <div class="input-group input-group-sm mt-2" *ngIf="factura.estado !== 'ANULADA' && (factura.saldo > 0 || pagosPendientes[factura.factura_id])">
+                    <span class="input-group-text">$</span>
+                    <input class="form-control" type="number" min="0.01" step="0.01" [max]="factura.saldo" placeholder="Valor" [(ngModel)]="montoPago[factura.factura_id]" [name]="'monto'+factura.factura_id" [disabled]="pagando.has(factura.factura_id) || !!pagosPendientes[factura.factura_id]">
+                    <select class="form-select" style="max-width:140px" [(ngModel)]="medioPago[factura.factura_id]" [name]="'medio'+factura.factura_id" [disabled]="pagando.has(factura.factura_id) || !!pagosPendientes[factura.factura_id]">
+                      <option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="PSE">PSE</option>
+                    </select>
+                    <button class="btn btn-success" type="button" (click)="registrarPago(factura)" [disabled]="pagando.has(factura.factura_id)">
+                      {{ pagando.has(factura.factura_id) ? 'Enviando…' : pagosPendientes[factura.factura_id] ? 'Reintentar mismo pago' : 'Registrar pago' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="expanded.has(factura.factura_id)">
+                <td colspan="8" class="bg-light">
+                  <div class="table-responsive" *ngIf="pagos[factura.factura_id]?.length; else sinPagos">
+                    <table class="table table-sm mb-0">
+                      <thead><tr><th>Movimiento</th><th>Fecha</th><th>Valor</th><th>Medio</th><th>Responsable</th><th>Detalle</th><th>Acción</th></tr></thead>
+                      <tbody>
+                        <tr *ngFor="let pago of pagos[factura.factura_id]">
+                          <td><span class="badge" [ngClass]="pago.tipo === 'REVERSO' ? 'bg-warning text-dark' : 'bg-primary'">{{ pago.tipo }}</span> #{{ pago.id }}</td>
+                          <td>{{ pago.pagado_en | date:'short' }}</td>
+                          <td [class.text-danger]="pago.tipo === 'REVERSO'">{{ moneda(pago.valor) }}</td>
+                          <td>{{ pago.medio }}</td>
+                          <td>{{ pago.usuario }}</td>
+                          <td>{{ pago.tipo === 'REVERSO' ? pago.motivo_reversion : 'Clave ' + pago.operacion_id }}</td>
+                          <td>
+                            <button class="btn btn-sm btn-outline-danger" type="button" *ngIf="esAdministrador && pago.tipo === 'PAGO' && (restanteReversion(factura.factura_id, pago) > 0 || reversionesPendientes[pago.id])" (click)="reversar(factura.factura_id, pago)" [disabled]="reversando.has(pago.id)">
+                              {{ reversando.has(pago.id) ? 'Enviando…' : reversionesPendientes[pago.id] ? 'Reintentar reembolso' : 'Reembolsar' }}
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <ng-template #sinPagos><span class="text-muted">Esta factura todavía no tiene pagos.</span></ng-template>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>

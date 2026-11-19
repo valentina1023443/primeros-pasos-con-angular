@@ -1,0 +1,23 @@
+<div class="container-fluid">
+  <div class="card shadow-sm mb-3">
+    <div class="card-header"><h4 class="mb-1">Reportes administrativos y contables</h4><p class="text-muted mb-0">Previsualice los resultados antes de exportar PDF o Excel.</p></div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4"><label class="form-label">Tipo de reporte</label><select class="form-select" [(ngModel)]="tipo" (ngModelChange)="cambioFiltro()"><option *ngFor="let item of tipos" [value]="item.id">{{ item.label }}</option></select></div>
+        <div class="col-md-3"><label class="form-label">Fecha inicial</label><input class="form-control" type="date" [(ngModel)]="desde" (ngModelChange)="cambioFiltro()"></div>
+        <div class="col-md-3"><label class="form-label">Fecha final</label><input class="form-control" type="date" [(ngModel)]="hasta" (ngModelChange)="cambioFiltro()"></div>
+        <div class="col-md-2"><label class="form-label">Formato</label><select class="form-select" [(ngModel)]="formato"><option value="xlsx">Excel</option><option value="pdf">PDF</option></select></div>
+        <div class="col-md-3"><label class="form-label">Filtrar estado (opcional)</label><select class="form-select" [(ngModel)]="estado" (ngModelChange)="cambioFiltro()"><option value="">Todos</option><option *ngFor="let item of estados" [value]="item">{{ item }}</option></select></div>
+        <div class="col-md-3"><label class="form-label">ID veterinario (opcional)</label><input class="form-control" type="number" min="1" [(ngModel)]="medicoId" (ngModelChange)="cambioFiltro()"></div>
+      </div>
+      <div class="d-flex gap-2 mt-4"><button class="btn btn-primary" [disabled]="cargando || !desde || !hasta" (click)="previsualizar()">{{ cargando ? 'Consultando…' : 'Previsualizar' }}</button><button class="btn btn-outline-primary" [disabled]="exportando || !preview" (click)="descargar()">{{ exportando ? 'Exportando…' : 'Descargar ' + formato.toUpperCase() }}</button></div>
+      <div class="alert alert-danger mt-3" *ngIf="error">{{ error }}</div>
+    </div>
+  </div>
+  <section class="card shadow-sm" *ngIf="preview as report">
+    <div class="card-header d-flex justify-content-between"><div><h5 class="mb-1">Vista previa: {{ report.tipo }}</h5><small>{{ report.desde }} a {{ report.hasta }} · Generado {{ report.generadoEn | date:'short' }}</small></div><span class="badge bg-primary align-self-start">{{ report.cantidad }} filas</span></div>
+    <div class="card-body" *ngIf="report.totales as totals"><div class="d-flex flex-wrap gap-3"><span class="badge bg-light text-dark border" *ngFor="let total of (totals | keyvalue)">{{ total.key }}: {{ total.value }}</span></div></div>
+    <div class="table-responsive" *ngIf="report.filas.length"><table class="table table-sm table-striped mb-0"><thead><tr><th *ngFor="let col of report.columnas">{{ col }}</th></tr></thead><tbody><tr *ngFor="let fila of report.filas"><td *ngFor="let col of report.columnas">{{ fila[col] }}</td></tr></tbody></table></div>
+    <div class="p-4 text-muted" *ngIf="!report.filas.length">No hay resultados para los filtros seleccionados.</div>
+  </section>
+</div>

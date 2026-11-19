@@ -1,0 +1,233 @@
+erDiagram
+    PERFIL ||--o{ USUARIO : asigna
+    USUARIO o|--o| MEDICO : cuenta_medica
+    CLIENTE o|--o| USUARIO : cuenta_cliente
+    ESPECIALIZACION ||--o{ MEDICO : clasifica
+    CLIENTE ||--o{ MASCOTA : propietario
+    MEDICO ||--o{ HORARIO_DISPONIBILIDAD : define
+    MEDICO ||--o{ CITA : atiende
+    MASCOTA ||--o{ CITA : agenda
+    USUARIO ||--o{ CITA_ESTADO_LOG : cambia
+    CITA ||--o{ CITA_ESTADO_LOG : historial
+    CITA ||--o| HISTORIA_MEDICA : genera
+    MEDICO ||--o{ HISTORIA_MEDICA : registra
+    MASCOTA ||--o{ HISTORIA_MEDICA : historial_clinico
+    CITA ||--o{ FORMULA_MEDICA : prescribe
+    HISTORIA_MEDICA ||--o{ FORMULA_MEDICA : justifica
+    MEDICO ||--o{ FORMULA_MEDICA : formula
+    MASCOTA ||--o{ FORMULA_MEDICA : paciente
+    MEDICAMENTO ||--o{ FORMULA_MEDICA : indicado
+    MEDICAMENTO ||--o{ MEDICAMENTO_INVENTARIO : inventariado
+    MEDICAMENTO_INVENTARIO ||--o{ LOTE_MEDICAMENTO : lotea
+    MEDICAMENTO_INVENTARIO ||--o{ MOVIMIENTO_INVENTARIO : afecta
+    LOTE_MEDICAMENTO ||--o{ MOVIMIENTO_INVENTARIO : mueve
+    USUARIO ||--o{ MOVIMIENTO_INVENTARIO : responsable
+    FORMULA_MEDICA ||--o| DESPACHO_MEDICAMENTO : se_dispensa
+    USUARIO ||--o{ DESPACHO_MEDICAMENTO : prepara
+    DESPACHO_MEDICAMENTO ||--o{ DESPACHO_DETALLE : contiene
+    MEDICAMENTO_INVENTARIO ||--o{ DESPACHO_DETALLE : producto
+    LOTE_MEDICAMENTO ||--o{ DESPACHO_DETALLE : lote_usado
+    DESPACHO_MEDICAMENTO ||--o{ DESPACHO_LOG : registra_estado
+    DESPACHO_MEDICAMENTO ||--o{ DESPACHO_OPERACION : idempotencia
+    USUARIO ||--o{ DESPACHO_LOG : audita
+    CITA ||--o| PREFACTURA : estima
+    PREFACTURA ||--|{ PREFACTURA_DETALLE : detalla
+    CITA ||--o| FACTURA : factura
+    CLIENTE ||--o{ FACTURA : recibe
+    MASCOTA ||--o{ FACTURA : asociada
+    FACTURA ||--|{ FACTURA_DETALLE : detalla
+    FACTURA ||--o{ PAGO_FACTURA : recibe_pago
+    USUARIO ||--o{ PAGO_FACTURA : registra
+    PAGO_FACTURA o|--o{ PAGO_FACTURA : pago_original_de
+    FACTURA ||--o{ FACTURA_LOG : audita
+    USUARIO ||--o{ FACTURA_LOG : actor
+    ESPECIALIZACION o|--o{ TARIFA_SERVICIO : tarifa
+    TARIFA_SERVICIO ||--o{ TARIFA_LOG : historial
+    USUARIO ||--o{ TARIFA_LOG : modifica
+    FACTURA ||--o{ FACTURA_TARIFA_SNAPSHOT : congela_tarifa
+    USUARIO ||--o{ IMPORTACION_INVENTARIO : carga
+    IMPORTACION_INVENTARIO ||--o{ IMPORTACION_INVENTARIO_DETALLE : valida
+    IMPORTACION_INVENTARIO ||--o{ IMPORTACION_INVENTARIO_ERROR : rechaza
+    USUARIO ||--o{ SESSION : autentica
+
+    PERFIL {
+      bigint id PK
+      varchar nombre UK
+    }
+    USUARIO {
+      bigint id PK
+      bigint perfil_id FK
+      bigint medico_id FK
+      bigint cliente_id FK,UK
+      varchar username UK
+      varchar password_hash
+      varchar rol
+      boolean activo
+    }
+    CLIENTE {
+      bigint cliente_id PK
+      varchar nombres
+      varchar apellidos
+    }
+    MASCOTA {
+      bigint mascota_id PK
+      bigint cliente_id FK
+      varchar nombre_mascota
+    }
+    MEDICO {
+      bigint id PK
+      bigint especializacion_id FK
+      varchar nombres
+      boolean activo
+    }
+    ESPECIALIZACION {
+      bigint id PK
+      varchar nombre
+      boolean activa
+    }
+    HORARIO_DISPONIBILIDAD {
+      bigint id PK
+      bigint medico_id FK
+      int dia_semana
+      time hora_inicio
+      time hora_fin
+      boolean activo
+    }
+    CITA {
+      bigint id PK
+      bigint mascota_id FK
+      bigint medico_id FK
+      datetime fecha
+      datetime fecha_fin
+      varchar estado
+    }
+    HISTORIA_MEDICA {
+      bigint id PK
+      bigint cita_id FK
+      bigint mascota_id FK
+      bigint medico_id FK
+      text diagnostico
+    }
+    MEDICAMENTO {
+      bigint medicamento_id PK
+      varchar nombre UK
+      varchar presentacion
+    }
+    MEDICAMENTO_INVENTARIO {
+      bigint id PK
+      bigint medicamento_id FK
+      varchar codigo UK
+      decimal precio_compra
+      decimal precio_venta
+      decimal iva_porcentaje
+      int stock_minimo
+      date fecha_ingreso
+      varchar registro_invima
+    }
+    LOTE_MEDICAMENTO {
+      bigint id PK
+      bigint inventario_id FK
+      varchar numero_lote
+      date fecha_vencimiento
+      int cantidad
+    }
+    FORMULA_MEDICA {
+      bigint formula_id PK
+      bigint cita_id FK
+      bigint historia_medica_id FK
+      bigint medico_id FK
+      bigint medicamento_id FK
+      int cantidad_prescrita
+      varchar via_administracion
+      varchar estado
+    }
+    DESPACHO_MEDICAMENTO {
+      bigint id PK
+      bigint formula_id FK
+      bigint usuario_id FK
+      varchar estado
+      datetime entregado_en
+    }
+    DESPACHO_DETALLE {
+      bigint id PK
+      bigint despacho_id FK
+      bigint medicamento_id FK
+      bigint lote_id FK
+      int cantidad_prescrita
+      int cantidad_entregada
+    }
+    MOVIMIENTO_INVENTARIO {
+      bigint id PK
+      bigint inventario_id FK
+      bigint lote_id FK
+      bigint usuario_id FK
+      bigint formula_id FK
+      bigint despacho_id FK
+      varchar tipo
+      int cantidad
+      datetime fecha
+    }
+    TARIFA_SERVICIO {
+      bigint id PK
+      bigint especializacion_id FK
+      varchar servicio
+      decimal valor
+      decimal iva_porcentaje
+      date vigente_desde
+      boolean activa
+    }
+    FACTURA {
+      bigint id PK
+      bigint cita_id FK
+      bigint cliente_id FK
+      bigint mascota_id FK
+      decimal subtotal
+      decimal iva
+      decimal descuento
+      decimal total
+      varchar estado
+    }
+    FACTURA_DETALLE {
+      bigint id PK
+      bigint factura_id FK
+      varchar concepto
+      int cantidad
+      decimal precio_unitario
+      decimal iva_porcentaje
+    }
+    PAGO_FACTURA {
+      bigint id PK
+      bigint factura_id FK
+      bigint pago_original_id FK
+      bigint usuario_id FK
+      varchar tipo
+      varchar operacion_id UK
+      decimal valor
+      varchar medio
+      varchar motivo_reversion
+      datetime pagado_en
+    }
+    PREFACTURA {
+      bigint id PK
+      bigint cita_id FK
+      decimal subtotal
+      decimal iva
+      decimal total
+    }
+    PREFACTURA_DETALLE {
+      bigint id PK
+      bigint prefactura_id FK
+      varchar concepto
+      int cantidad
+      decimal precio_unitario
+      decimal iva_porcentaje
+    }
+    IMPORTACION_INVENTARIO {
+      bigint id PK
+      bigint usuario_id FK
+      varchar nombre_archivo
+      int total_filas
+      int filas_validas
+      int filas_error
+      varchar estado
+    }

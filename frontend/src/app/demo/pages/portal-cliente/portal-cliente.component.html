@@ -1,0 +1,52 @@
+<div class="container-fluid portal-client">
+  <header class="portal-heading">
+    <div class="portal-heading__icon" aria-hidden="true">🐾</div>
+    <div>
+      <span class="portal-eyebrow">CLÍNICA VETERINARIA UNIMINUTO</span>
+      <h2>Mi portal</h2>
+      <p *ngIf="resumen">Hola, {{ resumen.cliente.nombres }}. Aquí está la información asociada a tu cuenta.</p>
+      <p *ngIf="!resumen">Consulta tus mascotas registradas y las próximas citas.</p>
+    </div>
+    <button class="btn btn-outline-primary ms-auto" type="button" (click)="cargar()" [disabled]="cargando">Actualizar</button>
+  </header>
+
+  <div *ngIf="cargando" class="alert alert-info" role="status">Cargando la información de tu cuenta…</div>
+  <div *ngIf="error" class="alert alert-danger" role="alert">{{ error }}</div>
+
+  <ng-container *ngIf="resumen as datos">
+    <section class="portal-section profile-card" aria-labelledby="profile-title">
+      <div>
+        <span class="portal-eyebrow">CUENTA VINCULADA</span>
+        <h3 id="profile-title">{{ datos.cliente.nombres }} {{ datos.cliente.apellidos }}</h3>
+        <p class="text-muted mb-0">{{ datos.cliente.tipoDocumento }} · {{ datos.cliente.numeroDocumento }}</p>
+      </div>
+      <div class="profile-details">
+        <span *ngIf="datos.cliente.telefono">Teléfono: {{ datos.cliente.telefono }}</span>
+        <span *ngIf="datos.cliente.direccion">Dirección: {{ datos.cliente.direccion }}</span>
+      </div>
+    </section>
+
+    <section class="portal-section" aria-labelledby="pets-title">
+      <div class="section-title"><div><span class="portal-eyebrow">FAMILIA</span><h3 id="pets-title">Mis mascotas</h3></div><span class="count-pill">{{ datos.mascotas.length }}</span></div>
+      <div class="pet-grid" *ngIf="datos.mascotas.length; else noPets">
+        <article class="pet-card" *ngFor="let mascota of datos.mascotas">
+          <div class="pet-card__paw" aria-hidden="true">🐾</div>
+          <div><h4>{{ mascota.nombre }}</h4><p>{{ mascota.especie || 'Mascota' }}<span *ngIf="mascota.raza"> · {{ mascota.raza }}</span></p><small *ngIf="mascota.edad !== null && mascota.edad !== undefined">{{ mascota.edad }} años</small></div>
+        </article>
+      </div>
+      <ng-template #noPets><div class="empty-state">No hay mascotas asociadas a tu ficha. Comunícate con la clínica para actualizarla.</div></ng-template>
+    </section>
+
+    <section class="portal-section" aria-labelledby="appointments-title">
+      <div class="section-title"><div><span class="portal-eyebrow">AGENDA</span><h3 id="appointments-title">Próximas citas</h3></div></div>
+      <div class="table-responsive" *ngIf="datos.proximasCitas.length; else noAppointments">
+        <table class="table align-middle appointment-table">
+          <thead><tr><th>Fecha</th><th>Mascota</th><th>Motivo</th><th>Profesional</th><th>Estado</th></tr></thead>
+          <tbody><tr *ngFor="let cita of datos.proximasCitas"><td>{{ fecha(cita.fecha) }}</td><td>{{ cita.mascota }}</td><td>{{ cita.motivo }}</td><td>{{ cita.medico || 'Por asignar' }}</td><td><span class="badge bg-info text-dark">{{ cita.estado }}</span></td></tr></tbody>
+        </table>
+      </div>
+      <ng-template #noAppointments><div class="empty-state">No tienes citas futuras registradas.</div></ng-template>
+      <p class="help-copy">Para agendar o cambiar una cita, contacta a la recepción de la clínica.</p>
+    </section>
+  </ng-container>
+</div>

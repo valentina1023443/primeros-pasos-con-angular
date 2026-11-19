@@ -1,0 +1,52 @@
+<div class="container mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Gestión de Anotaciones</h3>
+    <button class="btn btn-primary" (click)="abrirModalAgregar(modalItem)">+ Agregar anotación</button>
+  </div>
+
+  <div *ngIf="cargando">Cargando...</div>
+
+  <table class="table table-striped" *ngIf="!cargando">
+    <thead>
+      <tr><th>ID</th><th>Historia médica</th><th>Fecha</th><th>Descripción</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let a of registros">
+        <td>{{ a.id }}</td>
+        <td>{{ a.historiaMedica?.id }}</td>
+        <td>{{ a.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ a.descripcion }}</td>
+        <td><button class="btn btn-sm btn-outline-secondary" (click)="abrirModalEditar(modalItem, a)">Editar</button></td>
+      </tr>
+      <tr *ngIf="registros.length === 0"><td colspan="5" class="text-center">No hay anotaciones registradas</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #modalItem let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editando ? 'Editar' : 'Agregar' }} anotación</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-danger" *ngIf="mensajeError">{{ mensajeError }}</div>
+    <form [formGroup]="form">
+      <div class="mb-3">
+        <label class="form-label">ID de la historia médica</label>
+        <input type="number" class="form-control" formControlName="historiaMedicaId">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Fecha</label>
+        <input type="datetime-local" class="form-control" formControlName="fecha">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-control" formControlName="descripcion"></textarea>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-primary" (click)="guardar(modal)">Guardar</button>
+  </div>
+</ng-template>

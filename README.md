@@ -1,111 +1,33 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://codedthemes.com/item/datta-able-angular-lite/)
-[![GitHub package version](https://img.shields.io/github/package-json/v/codedthemes/datta-able-free-angular-admin-template)](https://github.com/codedthemes/datta-able-free-angular-admin-template/)
+# Clínica Veterinaria Uniminuto
 
-| -------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------- |
-| **9** Demo pages                                                                                   | **45+** demo pages                                                |
-| -                                                                                                  | ✓ Multi-language                                                  |
-| -                                                                                                  | ✓ Dark/Light Mode 🌓                                              |
-| -                                                                                                  | ✓ TypeScript version                                              |
-| -                                                                                                  | ✓ 6+ color Options                                                |
-| -                                                                                                  | ✓ RTL                                                             |
-| ✓ MIT License                                                                                      | ✓ [Pro License](https://codedthemes.com/item/datta-able-angular/?utm_source=free_demo&utm_medium=codedthemes&utm_campaign=button_download_premium) |
+Proyecto Full Stack para el examen final: Angular, API REST Spring Boot y MySQL 8.
 
-#### Preview
+## Inicio rápido
 
-- [Demo](https://codedthemes.com/demos/admin-templates/datta-able/angular/free/dashboard)
+Requiere Docker Engine con Docker Compose v2:
 
-#### Download
-
-- [Download from GitHub](https://github.com/codedthemes/datta-able-free-angular-admin-template)
-
-## Datta Able Pro version
-
-#### Preview
-
-- [Demo](https://codedthemes.com/demos/admin-templates/datta-able/angular/default/)
-
-#### Purchase
-
-- [Purchase from CodedThemes](https://codedthemes.com/item/datta-able-angular/?utm_source=free_demo&utm_medium=codedthemes&utm_campaign=button_download_premium)
-
-## Table of contents
-
-- [Getting Started](#getting-started)
-- [Documentation](#documentation)
-- [Technology Stack](#technology-stack)
-- [Author](#author)
-- [Issues?](#issues)
-- [License](#license)
-- [More Free Angular Templates](#more-free-angular-dashboard-templates)
-- [More Pro Angular Templates](#more-premium-angular-dashboard-templates)
-- [Follow us](#follow-us)
-
-## Getting Started
-
-1. Clone from Github
-
-```
-git clone https://github.com/codedthemes/datta-able-free-angular-admin-template.git
+```bash
+docker compose up --build -d
 ```
 
-2. Install packages
+- Aplicación: <http://localhost:4200>
+- API y Swagger: <http://localhost:8080/clinica/v1/swagger-ui.html>
+- Contrato OpenAPI: <http://localhost:8080/clinica/v1/v3/api-docs>
 
-```
-yarn
-```
+Cuentas ficticias de demostración: `admin.demo`, `medico.demo`, `secretaria.demo` y `despacho.demo`. La contraseña compartida es `DemoClinica2026!`. Para crear una cuenta de cliente, ingrese como administrador, registre o seleccione su ficha en Gestión de Clientes y luego use Gestión de Usuarios con el perfil Cliente. El cliente verá solo su ficha, sus mascotas y sus próximas citas. Las cuentas y la contraseña MySQL de Compose son solo para demostración local; no las use en producción.
 
-3. Run project
+## Documentación
 
-```
-yarn start
-```
+- [Guía de instalación, uso y reglas operativas](docs/README-FINAL.md)
+- [Ficha de entrega](docs/ENTREGA-EXAMEN.md)
+- [Auditoría de requisitos del PDF](docs/auditoria-requerimientos.md)
+- [API y ejemplos](docs/API.md)
+- [Modelo de datos](docs/modelo-datos.md), [diagrama](docs/modelo-datos.png) y [SQL consolidado](docs/modelo-datos.sql)
 
-## Documentation
+El PDF original del examen se incluye en `docs/examen-final.pdf`. El ZIP contiene el código fuente, la configuración Docker Compose y la documentación técnica, pero **no incluye las evidencias funcionales**. El anexo `evidencias-funcionales-examen-final.pdf` se entrega como archivo separado junto con este ZIP.
 
-[Datta Able Angular Documentation](https://codedthemes.gitbook.io/datta-angular/) helps you with installation, deployment, and troubleshooting.
+La aplicación y las migraciones se probaron contra MySQL 8.0.46 local. Docker Compose no se pudo ejecutar en el entorno de prueba porque Docker Engine no estaba disponible; la configuración y los Dockerfile sí forman parte del proyecto.
 
-## Technology Stack
+## Acceso
 
-- Bootstrap 5
-- Angular 18
-
-## Author
-
-Datta Able is developed by Team [CodedThemes](https://codedthemes.com).
-
-## Issues
-
-To report a bug, please submit an [issue](https://github.com/codedthemes/datta-able-free-angular-admin-template/issues) on Github. We will respond as soon as possible to resolve the issue.
-
-## License
-
-- Licensed cover under [MIT](https://github.com/codedthemes/datta-able-free-angular-admin-template/blob/master/LICENSE)
-
-## Datta Able - React version
-
-- [Free](https://lite.codedthemes.com/datta-able/react/default/dashboard/default)
-- [Premium](https://codedthemes.com/item/datta-able-react-admin-template/?utm_source=free_demo&utm_medium=codedthemes&utm_campaign=button_download_premium)
-
-## More Free Angular Dashboard Templates
-
-- [Mantis Angular](https://codedthemes.com/item/mantis-angular-free-admin-template/)
-- [Gradient Able Angular](https://codedthemes.com/item/gradient-able-angular-free-admin-template/)
-- [Next Angular](https://codedthemes.com/item/next-free-admin-template/)
-- [Berry Angular](https://codedthemes.com/item/berry-angular-free-admin-template/)
-
-## More Premium Angular Dashboard Templates
-
-- [Mantis Angular Pro](https://codedthemes.com/item/mantis-angular-admin-template/?utm_source=free_demo&utm_medium=codedthemes&utm_campaign=button_download_premium)
-- [Gradient Able Angular Pro](https://codedthemes.com/item/gradient-able-angular-admin-template/?utm_source=free_demo&utm_medium=codedthemes&utm_campaign=button_download_premium)
-- [Next Angular Pro](https://codedthemes.com/item/next-angular-admin-template/)
-- [Berry Angular Pro](https://codedthemes.com/item/berry-angular-admin-dashboard-template/?utm_source=free_demo&utm_medium=codedthemes&utm_campaign=button_download_premium)
-
-## Follow us
-
-- Website [https://codedthemes.com/demos/admin-templates/datta-able/angular/default](https://codedthemes.com/demos/admin-templates/datta-able/angular/default)
-- Blog [https://blog.codedthemes.com/](https://blog.codedthemes.com/)
-- CodedThemes [https://codedthemes.com](https://codedthemes.com)
-- Dribbble [https://dribbble.com/codedthemes](https://dribbble.com/codedthemes)
-- Facebook [https://www.facebook.com/codedthemes](https://www.facebook.com/codedthemes)
-- Twitter [https://twitter.com/codedthemes](https://twitter.com/codedthemes)
+La pantalla de inicio usa el logo de perro y gato de la aplicación, permite mostrar/ocultar la contraseña y recordar únicamente el nombre de usuario en el dispositivo. Si la API no responde, el login ahora lo distingue de una contraseña incorrecta. En una base Docker conservada de una versión anterior, las cuentas de demostración pueden no existir; reinicie el volumen solo si puede borrar sus datos. “¿Olvidaste tu contraseña?” y la solicitud de cuenta abren ayudas separadas; el administrador crea y vincula las cuentas de clientes. El restablecimiento automático por correo aún no está configurado.

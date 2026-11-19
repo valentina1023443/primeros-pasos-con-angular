@@ -1,0 +1,75 @@
+<div class="container mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Gestión de Medicamentos</h3>
+    <div class="d-flex gap-2">
+      <label *ngIf="esAdministrador" class="btn btn-outline-success mb-0">Cargar CSV/XLSX<input type="file" accept=".csv,.xlsx" hidden (change)="previsualizarImportacion($event)"></label>
+      <button *ngIf="esAdministrador" class="btn btn-primary" (click)="abrirModalAgregar(modalItem)">+ Agregar medicamento</button>
+    </div>
+  </div>
+
+  <div class="alert alert-info" *ngIf="importPreview">
+    <strong>Vista previa:</strong> {{ importPreview.totalFilas }} filas,
+    {{ importPreview.validos.length }} válidas y {{ importPreview.errores.length }} con errores.
+    <button class="btn btn-sm btn-success ms-3" [disabled]="!importPreview.puedeConfirmar" (click)="confirmarImportacion()">Confirmar válidas</button>
+    <ul class="mb-0 mt-2" *ngIf="importPreview.errores.length"><li *ngFor="let error of importPreview.errores">Fila {{ error.fila }}: {{ error.motivo }}</li></ul>
+  </div>
+
+  <div *ngIf="cargando">Cargando...</div>
+
+  <table class="table table-striped" *ngIf="!cargando">
+    <thead>
+      <tr><th>ID</th><th>Nombre</th><th>Presentación</th><th>Descripción</th><th *ngIf="esAdministrador">Acciones</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of registros">
+        <td>{{ m.id }}</td>
+        <td>{{ m.nombre }}</td>
+        <td>{{ m.presentacion }}</td>
+        <td>{{ m.descripcion }}</td>
+        <td *ngIf="esAdministrador"><button class="btn btn-sm btn-outline-secondary" (click)="abrirModalEditar(modalItem, m)">Editar</button></td>
+      </tr>
+      <tr *ngIf="registros.length === 0"><td colspan="5" class="text-center">No hay medicamentos registrados</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>Inventario, lotes y vencimientos</strong>
+      <input class="form-control form-control-sm w-25" [(ngModel)]="filtroInventario" (keyup.enter)="cargarInventario()" placeholder="Buscar producto o código">
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Código</th><th>Producto</th><th>Tipo</th><th>Invima</th><th>Stock</th><th>Mínimo</th><th>Vence</th><th>Venta</th></tr></thead>
+        <tbody><tr *ngFor="let item of inventario"><td>{{ item.codigo }}</td><td>{{ item.nombre }}</td><td>{{ item.tipo }}</td><td>{{ item.registro_invima || 'N/A' }}</td><td [class.text-danger]="item.stock <= item.stock_minimo">{{ item.stock }}</td><td>{{ item.stock_minimo }}</td><td>{{ item.proximo_vencimiento || 'Sin lote' }}</td><td>{{ item.precio_venta | currency:'COP':'symbol-narrow':'1.0-0' }}</td></tr><tr *ngIf="!inventario.length"><td colspan="8" class="text-center">No hay inventario cargado</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<ng-template #modalItem let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editando ? 'Editar' : 'Agregar' }} medicamento</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-danger" *ngIf="mensajeError">{{ mensajeError }}</div>
+    <form [formGroup]="form">
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input type="text" class="form-control" formControlName="nombre">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Presentación</label>
+        <input type="text" class="form-control" formControlName="presentacion" placeholder="Tabletas, Jarabe...">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-control" formControlName="descripcion"></textarea>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-primary" (click)="guardar(modal)">Guardar</button>
+  </div>
+</ng-template>
